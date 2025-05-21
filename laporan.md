@@ -44,7 +44,7 @@ Untuk mencapai tujuan di atas, saya mengajukan dua pendekatan solusi:
 
 ## Data Understanding
 
-Dataset MovieLens Small Latest adalah dataset yang berisi rating film dari pengguna MovieLens. Dataset ini dikeluarkan oleh GroupLens Research dan merupakan versi kecil dari dataset MovieLens yang lebih besar. Dataset ini dapat diunduh dari [GroupLens](https://grouplens.org/datasets/movielens/latest/) atau melalui [Kaggle](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset).
+Dataset MovieLens Small Latest adalah dataset yang berisi rating film dari pengguna MovieLens. Dataset ini dikeluarkan oleh GroupLens Research dan merupakan versi kecil dari dataset MovieLens yang lebih besar. Dataset ini dapat diunduh dari https://grouplens.org/datasets/movielens/latest/ atau https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset
 
 Dataset ini terdiri dari beberapa file dengan jumlah data dan kondisi sebagai berikut:
 
