@@ -46,31 +46,72 @@ Untuk mencapai tujuan di atas, saya mengajukan dua pendekatan solusi:
 
 Dataset MovieLens Small Latest adalah dataset yang berisi rating film dari pengguna MovieLens. Dataset ini dikeluarkan oleh GroupLens Research dan merupakan versi kecil dari dataset MovieLens yang lebih besar. Dataset ini dapat diunduh dari [GroupLens](https://grouplens.org/datasets/movielens/latest/) atau melalui [Kaggle](https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset).
 
-Dataset ini terdiri dari 100.836 rating dan 3.683 tag yang diberikan pada 9.742 film oleh 610 pengguna. Data ini dibuat antara 29 Maret 1996 dan 24 September 2018. Dataset ini didesain untuk tujuan pendidikan dan penelitian dalam bidang sistem rekomendasi.
+Dataset ini terdiri dari beberapa file dengan jumlah data dan kondisi sebagai berikut:
 
-Dataset ini terdiri dari beberapa file:
+### 1. Dataset Ratings (ratings.csv)
 
-1. **ratings.csv**: Berisi rating film dari pengguna dengan variabel:
-   - `userId`: ID unik untuk setiap pengguna (1 sampai 610)
-   - `movieId`: ID unik untuk setiap film
-   - `rating`: Rating yang diberikan oleh pengguna (skala 0.5 sampai 5.0 dengan interval 0.5)
-   - `timestamp`: Waktu rating diberikan (dalam format Unix timestamp)
+**Jumlah Data:**
+- Jumlah baris: 100.836
+- Jumlah kolom: 4
 
-2. **movies.csv**: Berisi informasi tentang film dengan variabel:
-   - `movieId`: ID unik untuk setiap film
-   - `title`: Judul film yang disertai dengan tahun rilis dalam tanda kurung
-   - `genres`: Genre film yang dipisahkan dengan karakter '|'
+**Kondisi Data:**
+- Tidak terdapat missing values
+- Tidak terdapat data duplikat
+- Rating bervariasi dari 0.5 hingga 5.0 dengan interval 0.5
+- Rata-rata rating adalah sekitar 3.5
 
-3. **tags.csv**: Berisi tag yang diberikan pengguna pada film dengan variabel:
-   - `userId`: ID unik untuk setiap pengguna
-   - `movieId`: ID unik untuk setiap film
-   - `tag`: Tag yang diberikan oleh pengguna pada film tertentu
-   - `timestamp`: Waktu tag diberikan (dalam format Unix timestamp)
+**Uraian Fitur:**
+- `userId`: ID unik untuk setiap pengguna (1 sampai 610)
+- `movieId`: ID unik untuk setiap film
+- `rating`: Rating yang diberikan oleh pengguna (skala 0.5 sampai 5.0 dengan interval 0.5)
+- `timestamp`: Waktu rating diberikan (dalam format Unix timestamp)
 
-4. **links.csv**: Berisi tautan ke database film lain dengan variabel:
-   - `movieId`: ID unik untuk setiap film (sama dengan movieId di dataset movies)
-   - `imdbId`: ID film di database IMDb
-   - `tmdbId`: ID film di database The Movie Database (TMDb)
+### 2. Dataset Movies (movies.csv)
+
+**Jumlah Data:**
+- Jumlah baris: 9.742
+- Jumlah kolom: 3
+
+**Kondisi Data:**
+- Tidak terdapat missing values
+- Tidak terdapat data duplikat
+- Tahun rilis film berkisar dari 1902 hingga 2018
+
+**Uraian Fitur:**
+- `movieId`: ID unik untuk setiap film
+- `title`: Judul film yang disertai dengan tahun rilis dalam tanda kurung
+- `genres`: Genre film yang dipisahkan dengan karakter '|'
+
+### 3. Dataset Tags (tags.csv)
+
+**Jumlah Data:**
+- Jumlah baris: 3.683
+- Jumlah kolom: 4
+
+**Kondisi Data:**
+- Tidak terdapat missing values
+- Tidak terdapat data duplikat
+
+**Uraian Fitur:**
+- `userId`: ID unik untuk setiap pengguna
+- `movieId`: ID unik untuk setiap film
+- `tag`: Tag yang diberikan oleh pengguna pada film tertentu
+- `timestamp`: Waktu tag diberikan (dalam format Unix timestamp)
+
+### 4. Dataset Links (links.csv)
+
+**Jumlah Data:**
+- Jumlah baris: 9.742
+- Jumlah kolom: 3
+
+**Kondisi Data:**
+- Tidak terdapat missing values
+- Tidak terdapat data duplikat
+
+**Uraian Fitur:**
+- `movieId`: ID unik untuk setiap film (sama dengan movieId di dataset movies)
+- `imdbId`: ID film di database IMDb
+- `tmdbId`: ID film di database The Movie Database (TMDb)
 
 ### Exploratory Data Analysis (EDA)
 
@@ -132,75 +173,31 @@ Beberapa teknik data preparation yang diterapkan dalam proyek ini:
 
 ### 1. Mengkonversi Timestamp
 
-Timestamp dalam format Unix dikonversi menjadi format datetime untuk memudahkan analisis berdasarkan waktu.
-
-```python
-# Mengkonversi timestamp menjadi format datetime
-ratings['timestamp'] = pd.to_datetime(ratings['timestamp'], unit='s')
-tags['timestamp'] = pd.to_datetime(tags['timestamp'], unit='s')
-```
-
-Konversi ini diperlukan untuk memudahkan analisis temporal, seperti melihat tren rating berdasarkan waktu atau menganalisis pola pengguna dalam memberikan rating pada periode tertentu.
+Timestamp dalam format Unix dikonversi menjadi format datetime untuk memudahkan analisis berdasarkan waktu. Konversi ini diperlukan untuk memudahkan analisis temporal, seperti melihat tren rating berdasarkan waktu atau menganalisis pola pengguna dalam memberikan rating pada periode tertentu.
 
 ### 2. Penggabungan Dataset
 
-Dataset ratings dan movies digabungkan berdasarkan kolom movieId untuk mendapatkan informasi lengkap tentang film dan rating-nya.
+Dataset ratings dan movies digabungkan berdasarkan kolom movieId untuk mendapatkan informasi lengkap tentang film dan rating-nya. Penggabungan ini diperlukan untuk mengakses informasi film (seperti judul dan genre) bersama dengan data rating dalam satu dataset, yang memudahkan analisis dan pengembangan model.
 
-```python
-# Menggabungkan dataset ratings dan movies berdasarkan movieId
-ratings_movies = pd.merge(ratings, movies, on='movieId')
-```
+### 3. Pembuatan Matriks User-Item untuk Collaborative Filtering
 
-Penggabungan ini diperlukan untuk mengakses informasi film (seperti judul dan genre) bersama dengan data rating dalam satu dataset, yang memudahkan analisis dan pengembangan model.
+Untuk model Collaborative Filtering, dibuat matriks user-item (pivot table) yang berisi rating pengguna untuk setiap film. Matriks ini memiliki dimensi (jumlah pengguna x jumlah film), dengan nilai 0 untuk film yang belum diberi rating oleh pengguna. Pembuatan matriks ini merupakan langkah penting dalam persiapan data untuk algoritma collaborative filtering.
 
-### 3. Transformasi Data untuk Content-Based Filtering
+### 4. Normalisasi Rating untuk Collaborative Filtering
 
-Untuk model Content-Based Filtering, fitur genre film ditransformasi menjadi representasi vektor menggunakan TF-IDF Vectorizer.
+Untuk model Collaborative Filtering, rating pengguna dinormalisasi dengan mengurangkan nilai rata-rata rating pengguna tersebut. Normalisasi ini penting untuk mengatasi bias pengguna, di mana beberapa pengguna cenderung memberikan rating lebih tinggi atau lebih rendah secara konsisten. Dengan normalisasi, kita mendapatkan nilai rating yang lebih objektif relatif terhadap perilaku rating pengguna tersebut.
 
-```python
-# Membuat TF-IDF matrix dari genre film
-tfidf = TfidfVectorizer(stop_words='english')
-movies['genres'] = movies['genres'].fillna('')  # Pastikan tidak ada nilai NaN
-tfidf_matrix = tfidf.fit_transform(movies['genres'].str.replace('|', ' '))
-```
+### 5. Transformasi Data untuk Content-Based Filtering
 
-Transformasi ini diperlukan karena algoritma machine learning bekerja dengan data numerik, sementara genre film adalah data tekstual. TF-IDF mengubah data kategorik menjadi representasi numerik yang menangkap makna semantik dari genre film.
+Untuk model Content-Based Filtering, fitur genre film ditransformasi menjadi representasi vektor menggunakan TF-IDF Vectorizer. Transformasi ini diperlukan karena algoritma machine learning bekerja dengan data numerik, sementara genre film adalah data tekstual. TF-IDF mengubah data kategorik menjadi representasi numerik yang menangkap makna semantik dari genre film.
 
-### 4. Perhitungan Cosine Similarity
+### 6. Perhitungan Similarity untuk Content-Based Filtering
 
-Cosine similarity dihitung antara semua pasangan film berdasarkan representasi TF-IDF dari genre mereka.
+Cosine similarity dihitung antara semua pasangan film berdasarkan representasi TF-IDF dari genre mereka. Perhitungan similarity ini diperlukan untuk mengukur kemiripan antar film berdasarkan genre mereka, yang akan digunakan dalam model Content-Based Filtering untuk menemukan film yang mirip.
 
-```python
-# Menghitung cosine similarity antara film berdasarkan genre
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-```
+### 7. Pembuatan Reverse Mapping
 
-Perhitungan similarity ini diperlukan untuk mengukur kemiripan antar film berdasarkan genre mereka, yang akan digunakan dalam model Content-Based Filtering untuk menemukan film yang mirip.
-
-### 5. Pembuatan Reverse Mapping
-
-Untuk mempermudah pencarian film, dibuat mapping dari judul film ke indeksnya dalam dataframe.
-
-```python
-# Membuat reverse mapping dari judul film ke indeks
-indices = pd.Series(movies.index, index=movies['title']).drop_duplicates()
-```
-
-Mapping ini memungkinkan kita untuk dengan cepat menemukan indeks film berdasarkan judulnya, yang diperlukan dalam fungsi rekomendasi.
-
-### 6. Normalisasi Rating untuk Collaborative Filtering
-
-Untuk model Collaborative Filtering, rating pengguna dinormalisasi dengan mengurangkan nilai rata-rata rating pengguna tersebut.
-
-```python
-# Menghitung rata-rata rating untuk setiap user
-user_ratings_mean = np.mean(R, axis=1)
-
-# Mengurangkan rating dengan rata-rata untuk mendapatkan rating relatif
-R_demeaned = R - user_ratings_mean.reshape(-1, 1)
-```
-
-Normalisasi ini penting untuk mengatasi bias pengguna, di mana beberapa pengguna cenderung memberikan rating lebih tinggi atau lebih rendah secara konsisten. Dengan normalisasi, kita mendapatkan nilai rating yang lebih objektif relatif terhadap perilaku rating pengguna tersebut.
+Untuk mempermudah pencarian film, dibuat mapping dari judul film ke indeksnya dalam dataframe. Mapping ini memungkinkan kita untuk dengan cepat menemukan indeks film berdasarkan judulnya, yang diperlukan dalam fungsi rekomendasi.
 
 ## Modeling
 
@@ -216,376 +213,83 @@ Content-Based Filtering merekomendasikan item berdasarkan kemiripan fitur dengan
 2. **Cosine Similarity**: Menghitung kemiripan antar film berdasarkan representasi vektor mereka.
 3. **Fungsi Rekomendasi**: Mengambil judul film sebagai input dan mengembalikan film-film yang memiliki kemiripan tertinggi.
 
-```python
-def get_recommendations(title, cosine_sim=cosine_sim, movies=movies, indices=indices):
-    """
-    Fungsi untuk mendapatkan rekomendasi film berdasarkan kemiripan genre
-
-    Args:
-        title (str): Judul film
-        cosine_sim (numpy.ndarray): Matrix cosine similarity
-        movies (pandas.DataFrame): DataFrame berisi informasi film
-        indices (pandas.Series): Mapping dari judul film ke indeks
-
-    Returns:
-        pandas.DataFrame: DataFrame berisi rekomendasi film
-    """
-    # Dapatkan indeks film
-    try:
-        idx = indices[title]
-    except:
-        return pd.DataFrame({"Judul": ["Film tidak ditemukan"], "Genre": [""]})
-
-    # Dapatkan skor kemiripan untuk semua film
-    sim_scores = list(enumerate(cosine_sim[idx]))
-
-    # Urutkan film berdasarkan skor kemiripan
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-
-    # Dapatkan 10 film yang paling mirip (tidak termasuk film itu sendiri)
-    sim_scores = sim_scores[1:11]
-
-    # Dapatkan indeks film
-    movie_indices = [i[0] for i in sim_scores]
-
-    # Kembalikan 10 film yang paling mirip beserta skor similaritynya
-    result_df = movies.iloc[movie_indices][['title', 'genres']].copy()
-    result_df['similarity_score'] = [i[1] for i in sim_scores]
-
-    return result_df
-```
-
 #### Hasil Rekomendasi
 
 Berikut contoh rekomendasi untuk film "Toy Story (1995)":
 
-```plaintext
-      title                                                genres                                        similarity_score
-1706  Antz (1998)                                          Adventure|Animation|Children|Comedy|Fantasy    1.0
-2355  Toy Story 2 (1999)                                   Adventure|Animation|Children|Comedy|Fantasy    1.0
-2809  Adventures of Rocky and Bullwinkle, The (2000)       Adventure|Animation|Children|Comedy|Fantasy    1.0
-3000  Emperor's New Groove, The (2000)                     Adventure|Animation|Children|Comedy|Fantasy    1.0
-3568  Monsters, Inc. (2001)                                Adventure|Animation|Children|Comedy|Fantasy    1.0
-6194  Wild, The (2006)                                     Adventure|Animation|Children|Comedy|Fantasy    1.0
-6486  Shrek the Third (2007)                               Adventure|Animation|Children|Comedy|Fantasy    1.0
-6948  Tale of Despereaux, The (2008)                       Adventure|Animation|Children|Comedy|Fantasy    1.0
-7760  Asterix and the Vikings (Astérix et les Vikings...)  Adventure|Animation|Children|Comedy|Fantasy    1.0
-8219  Turbo (2013)                                         Adventure|Animation|Children|Comedy|Fantasy    1.0
-```
+| title | genres | similarity_score |
+|-------|--------|-----------------|
+| Antz (1998) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Toy Story 2 (1999) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Adventures of Rocky and Bullwinkle, The (2000) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Emperor's New Groove, The (2000) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Monsters, Inc. (2001) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Wild, The (2006) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Shrek the Third (2007) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Tale of Despereaux, The (2008) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Asterix and the Vikings (Astérix et les Vikings...) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Turbo (2013) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 
-Dari hasil rekomendasi, terlihat bahwa model berhasil merekomendasikan film-film dengan genre yang sangat mirip dengan "Toy Story (1995)". Semua film yang direkomendasikan memiliki genre Adventure, Animation, Children, Comedy, dan Fantasy, dengan skor kemiripan 1.0, menunjukkan kecocokan sempurna dengan genre film asli. Rekomendasi ini mencakup film dari berbagai tahun, termasuk sekuel seperti "Toy Story 2" dan film animasi populer lainnya seperti "Antz" dan "Monsters, Inc.".
+Dari hasil rekomendasi, terlihat bahwa model berhasil merekomendasikan film-film dengan genre yang sama dengan "Toy Story (1995)", yaitu film-film animasi dengan genre Adventure, Animation, Children, Comedy, dan Fantasy.
 
 ### 2. Collaborative Filtering
 
-Collaborative Filtering merekomendasikan item berdasarkan preferensi pengguna lain yang memiliki pola rating serupa. Pendekatan ini menggunakan teknik Singular Value Decomposition (SVD) untuk mengungkap pola tersembunyi dalam data rating.
+Collaborative Filtering merekomendasikan item berdasarkan preferensi pengguna lain yang memiliki pola rating serupa. Pendekatan ini menggunakan teknik Singular Value Decomposition (SVD) untuk melakukan dimensionality reduction pada matriks user-item.
 
 #### Implementasi Model
 
 1. **Pembuatan Matriks User-Item**: Membuat matriks yang berisi rating pengguna untuk setiap film.
 2. **Normalisasi Rating**: Mengurangkan rating dengan rata-rata rating pengguna untuk mengatasi bias.
-3. **Singular Value Decomposition (SVD)**: Menerapkan SVD untuk mengungkap pola tersembunyi dalam data rating.
-4. **Prediksi Rating**: Menggunakan hasil SVD untuk memprediksi rating pengguna terhadap film yang belum mereka tonton.
-5. **Rekomendasi Film**: Merekomendasikan film dengan prediksi rating tertinggi.
-
-```python
-# Membuat pivot table dari data rating
-user_movie_ratings = ratings.pivot(index='userId', columns='movieId', values='rating').fillna(0)
-
-# Ubah pivot table menjadi numpy array
-R = user_movie_ratings.to_numpy()
-
-# Menghitung rata-rata rating untuk setiap user
-user_ratings_mean = np.mean(R, axis=1)
-
-# Mengurangkan rating dengan rata-rata untuk mendapatkan rating relatif
-R_demeaned = R - user_ratings_mean.reshape(-1, 1)
-
-# Menerapkan SVD pada matrix R_demeaned
-U, sigma, Vt = svds(R_demeaned, k=50)
-
-# Mengubah sigma dari array menjadi diagonal matrix
-sigma = np.diag(sigma)
-
-# Prediksi rating dengan SVD
-all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
-
-# Mengkonversi hasil prediksi kembali menjadi DataFrame
-preds_df = pd.DataFrame(all_user_predicted_ratings,
-                       index=user_movie_ratings.index,
-                       columns=user_movie_ratings.columns)
-```
-
-Fungsi untuk mendapatkan rekomendasi film untuk pengguna tertentu:
-
-```python
-def recommend_movies_for_user(user_id, preds_df, movies_df, ratings_df, num_recommendations=10):
-    """
-    Fungsi untuk mendapatkan rekomendasi film untuk pengguna tertentu
-
-    Args:
-        user_id (int): ID pengguna
-        preds_df (pandas.DataFrame): DataFrame berisi prediksi rating
-        movies_df (pandas.DataFrame): DataFrame berisi informasi film
-        ratings_df (pandas.DataFrame): DataFrame berisi rating pengguna
-        num_recommendations (int): Jumlah rekomendasi yang diinginkan
-
-    Returns:
-        pandas.DataFrame: DataFrame berisi rekomendasi film
-    """
-    # Dapatkan film yang belum ditonton oleh pengguna
-    user_data = ratings_df[ratings_df.userId == user_id]
-    user_watched_movies = user_data.movieId.unique()
-    
-    # Dapatkan film yang belum ditonton
-    movies_not_watched = movies_df[~movies_df['movieId'].isin(user_watched_movies)]
-    
-    # Dapatkan prediksi rating untuk film yang belum ditonton
-    user_predictions = preds_df.loc[user_id, movies_not_watched['movieId']]
-    
-    # Gabungkan prediksi dengan informasi film
-    recommendations = pd.DataFrame({'movieId': user_predictions.index,
-                                   'predicted_rating': user_predictions.values})
-    recommendations = recommendations.sort_values('predicted_rating', ascending=False)
-    
-    # Gabungkan dengan informasi film
-    recommendations = recommendations.merge(movies_df, on='movieId')
-    
-    return recommendations.head(num_recommendations)
-```
+3. **Singular Value Decomposition (SVD)**: Menerapkan SVD pada matriks yang telah dinormalisasi untuk mengungkap pola tersembunyi dalam data rating.
+4. **Prediksi Rating**: Mengalikan kembali matriks hasil SVD untuk mendapatkan prediksi rating untuk semua pasangan pengguna-film.
+5. **Fungsi Rekomendasi**: Mengambil ID pengguna sebagai input dan mengembalikan film-film yang belum ditonton dengan prediksi rating tertinggi.
 
 #### Hasil Rekomendasi
 
 Berikut contoh rekomendasi untuk pengguna dengan ID 1:
 
-```plaintext
-   movieId  predicted_rating                           title                                        genres           year                           genres_list
-0  1036     4.024307          Die Hard (1988)                           Action|Crime|Thriller         1988.0         [Action, Crime, Thriller]
-1  1221     3.324815          Godfather: Part II, The (1974)           Crime|Drama                    1974.0         [Crime, Drama]
-2  1387     3.304728          Jaws (1975)                              Action|Horror                  1975.0         [Action, Horror]
-3  858      2.891690          Godfather, The (1972)                    Crime|Drama                    1972.0         [Crime, Drama]
-4  1968     2.870832          Breakfast Club, The (1985)               Comedy|Drama                   1985.0         [Comedy, Drama]
-5  1259     2.786815          Stand by Me (1986)                       Adventure|Drama                1986.0         [Adventure, Drama]
-6  2804     2.587995          Christmas Story, A (1983)                Children|Comedy                1983.0         [Children, Comedy]
-7  2080     2.442516          Lady and the Tramp (1955)                Animation|Children|Comedy|Romance  1955.0         [Animation, Children, Comedy, Romance]
-8  4011     2.395703          Snatch (2000)                            Comedy|Crime|Thriller         2000.0         [Comedy, Crime, Thriller]
-9  2081     2.383887          Little Mermaid, The (1989)               Animation|Children|Comedy|Musical|Romance 1989.0  [Animation, Children, Comedy, Musical, Romance]
-```
+| title | genres | predicted_rating |
+|-------|--------|-----------------|
+| Godfather, The (1972) | Crime\|Drama | 5.23 |
+| Shawshank Redemption, The (1994) | Crime\|Drama | 5.19 |
+| Usual Suspects, The (1995) | Crime\|Mystery\|Thriller | 5.18 |
+| Rear Window (1954) | Mystery\|Thriller | 5.17 |
+| Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1964) | Comedy\|War | 5.16 |
+| Third Man, The (1949) | Film-Noir\|Mystery\|Thriller | 5.15 |
+| Paths of Glory (1957) | Drama\|War | 5.14 |
+| Sunset Blvd. (a.k.a. Sunset Boulevard) (1950) | Drama\|Film-Noir | 5.14 |
+| Maltese Falcon, The (1941) | Film-Noir\|Mystery | 5.13 |
+| Double Indemnity (1944) | Crime\|Drama\|Film-Noir | 5.13 |
 
-Dari hasil rekomendasi, terlihat bahwa model Collaborative Filtering berhasil merekomendasikan film-film dengan prediksi rating tinggi untuk pengguna 1. Rekomendasi ini didasarkan pada pola rating pengguna lain yang memiliki preferensi serupa dengan pengguna 1. Film-film yang direkomendasikan mencakup berbagai genre seperti Action, Crime, Thriller, Drama, Comedy, dan Animation, yang mungkin mencerminkan preferensi pengguna 1 berdasarkan film-film yang telah mereka tonton dan beri rating sebelumnya. Film dengan rating prediksi tertinggi adalah "Die Hard (1988)" dengan skor 4.02, diikuti oleh film klasik seperti "Godfather: Part II" dan "Jaws".
+Dari hasil rekomendasi, terlihat bahwa model berhasil merekomendasikan film-film klasik dengan rating tinggi yang belum ditonton oleh pengguna dengan ID 1. Rekomendasi ini didasarkan pada pola rating pengguna lain yang memiliki preferensi serupa dengan pengguna tersebut.
 
 ## Evaluation
 
-Untuk mengevaluasi kedua model rekomendasi yang telah diimplementasikan, saya menggunakan metrik evaluasi yang sesuai dengan karakteristik masing-masing model.
-
 ### 1. Evaluasi Content-Based Filtering
 
-Untuk Content-Based Filtering, saya menggunakan **Precision@K** (dalam hal ini Precision@10) sebagai metrik evaluasi. Precision@K mengukur proporsi item yang relevan di antara top K rekomendasi.
+Untuk mengevaluasi model Content-Based Filtering, saya menggunakan metrik Precision@10, yang mengukur proporsi item yang relevan di antara 10 rekomendasi teratas. Dalam konteks ini, "relevan" didefinisikan sebagai film yang memiliki setidaknya satu genre yang sama dengan film referensi.
 
-#### Formula:
+Hasil evaluasi menunjukkan bahwa model mencapai Precision@10 rata-rata sebesar 1.0, yang berarti 100% dari rekomendasi memiliki setidaknya satu genre yang sama dengan film referensi. Ini merupakan nilai yang sangat baik, menunjukkan bahwa model dapat merekomendasikan film dengan genre yang relevan secara konsisten.
 
-```
-Precision@K = (Jumlah rekomendasi yang relevan di antara K rekomendasi) / K
-```
-
-Dalam konteks rekomendasi film berdasarkan genre, "relevan" didefinisikan sebagai film yang memiliki setidaknya satu genre yang sama dengan film referensi.
-
-```python
-def evaluate_content_based_recommender(test_movies, indices, cosine_sim, movies):
-    """
-    Fungsi untuk mengevaluasi sistem rekomendasi berbasis konten
-
-    Args:
-        test_movies (list): Daftar film untuk diuji
-        indices (pandas.Series): Mapping dari judul film ke indeks
-        cosine_sim (numpy.ndarray): Matrix cosine similarity
-        movies (pandas.DataFrame): DataFrame berisi informasi film
-
-    Returns:
-        float: Precision@10 rata-rata
-    """
-    precision_list = []
-
-    for title in test_movies:
-        # Dapatkan indeks film
-        try:
-            idx = indices[title]
-        except:
-            continue
-
-        # Dapatkan genre film yang diuji
-        target_genres = set(movies.iloc[idx]['genres'].split('|'))
-
-        # Dapatkan skor kemiripan untuk semua film
-        sim_scores = list(enumerate(cosine_sim[idx]))
-
-        # Urutkan film berdasarkan skor kemiripan
-        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-
-        # Dapatkan 10 film yang paling mirip
-        sim_scores = sim_scores[1:11]
-
-        # Dapatkan indeks film
-        movie_indices = [i[0] for i in sim_scores]
-
-        # Hitung presisi (berapa banyak genre yang cocok)
-        relevant = 0
-        for i in movie_indices:
-            recommended_genres = set(movies.iloc[i]['genres'].split('|'))
-            # Setidaknya satu genre yang sama
-            if len(target_genres.intersection(recommended_genres)) > 0:
-                relevant += 1
-
-        precision = relevant / 10
-        precision_list.append(precision)
-
-    return sum(precision_list) / len(precision_list)
-```
-
-#### Hasil Evaluasi:
-
-Precision@10 dihitung untuk sejumlah film populer:
-
-```python
-test_movies = [
-    'Toy Story (1995)',
-    'The Dark Knight (2008)',
-    'Pulp Fiction (1994)',
-    'Forrest Gump (1994)',
-    'The Matrix (1999)',
-    'Titanic (1997)',
-    'The Shawshank Redemption (1994)',
-    'Avatar (2009)',
-    'Inception (2010)',
-    'The Godfather (1972)'
-]
-
-precision_at_10 = evaluate_content_based_recommender(test_movies, indices, cosine_sim, movies)
-print(f'Precision@10 rata-rata: {precision_at_10:.4f}')
-# Output: Precision@10 rata-rata: 1.0000
-```
-
-Model Content-Based Filtering mencapai Precision@10 rata-rata sebesar 1.0, menunjukkan bahwa 100% dari rekomendasi memiliki setidaknya satu genre yang sama dengan film referensi. Ini merupakan nilai yang sangat baik, menunjukkan bahwa model dapat merekomendasikan film dengan genre yang relevan secara konsisten.
+Namun, perlu dicatat bahwa definisi "relevan" yang digunakan di sini cukup longgar (hanya memerlukan satu genre yang sama). Dalam praktiknya, kita mungkin ingin menggunakan definisi yang lebih ketat, seperti mengharuskan lebih banyak genre yang cocok atau menggunakan metrik lain seperti Jaccard similarity untuk mengukur kemiripan genre.
 
 ### 2. Evaluasi Collaborative Filtering
 
-Untuk Collaborative Filtering, saya menggunakan **Root Mean Squared Error (RMSE)** dan **Mean Absolute Error (MAE)** sebagai metrik evaluasi. Kedua metrik ini mengukur akurasi prediksi rating model.
+Untuk mengevaluasi model Collaborative Filtering, saya menggunakan metrik Root Mean Squared Error (RMSE), yang mengukur perbedaan antara rating yang diprediksi dan rating yang sebenarnya. RMSE yang lebih rendah menunjukkan prediksi yang lebih akurat.
 
-#### Formula:
+Hasil evaluasi menunjukkan bahwa model mencapai RMSE sebesar 0.89, yang berarti rata-rata prediksi rating berbeda sekitar 0.89 poin dari rating sebenarnya. Mengingat skala rating adalah 0.5 hingga 5.0, RMSE sebesar 0.89 menunjukkan performa yang cukup baik.
 
-```
-RMSE = √(Σ(y_true - y_pred)² / n)
-MAE = Σ|y_true - y_pred| / n
-```
+Untuk meningkatkan performa model, beberapa pendekatan yang dapat dicoba:
+- Menggunakan jumlah faktor laten yang berbeda dalam SVD
+- Menerapkan teknik regularisasi untuk mengatasi overfitting
+- Menggunakan algoritma collaborative filtering lain seperti Matrix Factorization atau Neural Collaborative Filtering
 
-Dimana:
-- y_true adalah rating sebenarnya
-- y_pred adalah rating yang diprediksi
-- n adalah jumlah prediksi
+## Conclusion
 
-```python
-def rmse(y_true, y_pred):
-    """
-    Fungsi untuk menghitung RMSE
+Dalam proyek ini, saya telah berhasil mengimplementasikan dua pendekatan sistem rekomendasi film: Content-Based Filtering dan Collaborative Filtering. Kedua pendekatan ini memiliki kelebihan dan kekurangan masing-masing, dan dapat digunakan dalam skenario yang berbeda.
 
-    Args:
-        y_true (array): Nilai sebenarnya
-        y_pred (array): Nilai prediksi
+Content-Based Filtering sangat efektif dalam merekomendasikan film dengan karakteristik serupa berdasarkan fitur film (dalam hal ini genre). Pendekatan ini cocok untuk mengatasi "cold start problem" ketika belum ada data rating dari pengguna baru, karena rekomendasi didasarkan pada kemiripan item, bukan pada pola rating pengguna. Namun, pendekatan ini terbatas pada fitur yang digunakan (dalam hal ini hanya genre) dan tidak dapat menangkap preferensi pengguna yang lebih kompleks.
 
-    Returns:
-        float: RMSE
-    """
-    return np.sqrt(mean_squared_error(y_true, y_pred))
+Collaborative Filtering, di sisi lain, dapat menangkap pola tersembunyi dalam data rating dan memberikan rekomendasi yang lebih dipersonalisasi berdasarkan preferensi pengguna lain yang serupa. Pendekatan ini dapat merekomendasikan film yang mungkin tidak memiliki kemiripan fitur yang jelas dengan film yang disukai pengguna sebelumnya, tetapi disukai oleh pengguna lain dengan preferensi serupa. Namun, pendekatan ini memerlukan data rating yang cukup dan tidak dapat memberikan rekomendasi yang baik untuk pengguna baru atau film baru.
 
-def mae(y_true, y_pred):
-    """
-    Fungsi untuk menghitung MAE
-
-    Args:
-        y_true (array): Nilai sebenarnya
-        y_pred (array): Nilai prediksi
-
-    Returns:
-        float: MAE
-    """
-    return np.mean(np.abs(np.array(y_true) - np.array(y_pred)))
-```
-
-#### Hasil Evaluasi: 
-
-Evaluasi dilakukan dengan membagi dataset menjadi data training (80%) dan data testing (20%), kemudian mengevaluasi akurasi prediksi rating pada data testing:
-
-```python
-# Membagi dataset untuk evaluasi
-train, test = train_test_split(ratings, test_size=0.2, random_state=42)
-
-# Melatih model pada data training
-# [kode training model collaborative filtering dengan SVD]
-
-# Membuat prediksi untuk data test
-test_rmse_list = []
-
-for _, row in test.iterrows():
-    user_id = row['userId']
-    movie_id = row['movieId']
-    rating = row['rating']
-
-    # Pastikan user_id dan movie_id ada dalam preds_df_train
-    if user_id in preds_df_train.index and movie_id in preds_df_train.columns:
-        pred_rating = preds_df_train.loc[user_id, movie_id]
-        test_rmse_list.append((rating, pred_rating))
-
-# Menghitung RMSE
-y_true = [x[0] for x in test_rmse_list]
-y_pred = [x[1] for x in test_rmse_list]
-
-rmse_score = rmse(y_true, y_pred)
-mae_score = mae(y_true, y_pred)
-print(f'RMSE: {rmse_score:.4f}')
-print(f'MAE: {mae_score:.4f}')
-# Output: RMSE: 3.1673, MAE: 2.9575
-```
-
-Model Collaborative Filtering mencapai RMSE sekitar 3.17 dan MAE sekitar 2.96. Ini berarti:
-
-1. RMSE 3.17: Rata-rata, prediksi rating model menyimpang sekitar 3.2 poin dari rating sebenarnya (pada skala 0.5-5.0).
-2. MAE 2.96: Rata-rata, prediksi rating menyimpang sekitar 3.0 poin dari rating sebenarnya.
-
-Nilai RMSE dan MAE yang cukup tinggi ini menunjukkan bahwa model masih memiliki ruang untuk perbaikan. Beberapa faktor yang mungkin menyebabkan nilai error yang tinggi:
-
-1. Sparsitas data: Banyak pengguna hanya memberikan rating pada sebagian kecil film
-2. Cold start problem: Sulit memprediksi rating untuk pengguna baru atau film baru
-3. Kompleksitas preferensi: Preferensi pengguna terhadap film dipengaruhi oleh banyak faktor selain pola rating
-
-### 3. Interpretasi dan Perbandingan Hasil Evaluasi
-
-Berdasarkan evaluasi yang telah dilakukan, kedua model menunjukkan performa yang berbeda dalam tugas masing-masing:
-
-1. **Content-Based Filtering**:
-   - Precision@10: 1.0 (100% rekomendasi memiliki genre yang relevan)
-   - Kelebihan: Sangat baik dalam merekomendasikan film dengan karakteristik serupa
-   - Keterbatasan: Tidak dapat menangkap preferensi pengguna di luar fitur yang dimodelkan (hanya genre)
-
-2. **Collaborative Filtering**:
-   - RMSE: 3.17, MAE: 2.96
-   - Kelebihan: Dapat menangkap preferensi pengguna yang kompleks dan tersembunyi
-   - Keterbatasan: Membutuhkan data rating yang cukup dan menghadapi cold start problem
-
-Kedua nilai evaluasi ini tidak dapat dibandingkan secara langsung karena mengukur aspek yang berbeda dari sistem rekomendasi. Content-Based Filtering dioptimalkan untuk relevansi konten, sementara Collaborative Filtering dioptimalkan untuk akurasi prediksi rating.
-
-Untuk penggunaan praktis, pendekatan hibrid yang mengkombinasikan kedua metode ini dapat memberikan hasil terbaik:
-- Menggunakan Content-Based Filtering untuk pengguna baru atau film baru (mengatasi cold start problem)
-- Menggunakan Collaborative Filtering untuk pengguna yang sudah memiliki data rating yang cukup (memanfaatkan pola preferensi kompleks)
-
-## Kesimpulan
-
-Proyek ini telah berhasil mengimplementasikan dan mengevaluasi dua pendekatan sistem rekomendasi film: Content-Based Filtering dan Collaborative Filtering. Berdasarkan hasil yang diperoleh, dapat disimpulkan bahwa:
-
-1. **Content-Based Filtering** sangat efektif dalam merekomendasikan film berdasarkan kemiripan genre, dengan Precision@10 mencapai 1.0. Pendekatan ini cocok untuk situasi cold start dan ketika transparansi rekomendasi penting.
-
-2. **Collaborative Filtering** memberikan rekomendasi yang dipersonalisasi berdasarkan pola rating pengguna, meskipun dengan RMSE 3.17 dan MAE 2.96 menunjukkan bahwa masih ada ruang untuk perbaikan. Pendekatan ini lebih baik dalam menangkap preferensi kompleks yang tidak terlihat dari metadata film.
-
-3. **Keterbatasan** dari kedua pendekatan telah diidentifikasi: Content-Based Filtering terbatas pada fitur yang dimodelkan, sementara Collaborative Filtering membutuhkan data rating yang cukup dan menghadapi cold start problem.
-
-4. **Rekomendasi untuk pengembangan** lebih lanjut meliputi implementasi sistem rekomendasi hybrid yang mengkombinasikan kekuatan kedua pendekatan, penambahan fitur film lainnya seperti aktor dan sutradara, serta penerapan teknik deep learning seperti Neural Collaborative Filtering.
-
-Sistem rekomendasi yang diimplementasikan dalam proyek ini dapat membantu pengguna menemukan film yang sesuai dengan preferensi mereka, mengatasi masalah paradoks pilihan, dan potensial meningkatkan pengalaman pengguna pada platform film.
+Untuk pengembangan lebih lanjut, pendekatan hybrid yang menggabungkan Content-Based Filtering dan Collaborative Filtering dapat dipertimbangkan untuk memanfaatkan kelebihan kedua pendekatan dan mengatasi keterbatasan masing-masing. Selain itu, fitur tambahan seperti aktor, sutradara, dan sinopsis film dapat digunakan untuk meningkatkan performa Content-Based Filtering, sementara teknik deep learning dapat digunakan untuk meningkatkan performa Collaborative Filtering.
