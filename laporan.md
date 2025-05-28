@@ -2,223 +2,160 @@
 
 ## Project Overview
 
-Sistem rekomendasi telah menjadi komponen penting dalam platform digital modern, membantu pengguna menemukan konten yang relevan di tengah banjirnya informasi. Di industri hiburan khususnya, sistem rekomendasi film menjadi krusial bagi platform streaming dan database film untuk meningkatkan engagement pengguna, retensi pelanggan, dan pendapatan [1].
+Sistem rekomendasi telah menjadi elemen kunci dalam platform digital modern, khususnya di industri hiburan, untuk membantu pengguna menemukan konten yang relevan di tengah banyaknya pilihan. Dalam konteks platform streaming dan database film, sistem rekomendasi film memainkan peran penting dalam meningkatkan *engagement* pengguna, retensi pelanggan, dan pendapatan [1]. Namun, pengguna sering menghadapi "paradoks pilihan," di mana banyaknya opsi film menyebabkan kesulitan dalam memilih tontonan, yang dapat menurunkan kepuasan pengguna [2]. Penelitian dari Nielsen menunjukkan bahwa 70% penonton menghabiskan 2-3 menit untuk mencari konten, dan 21% menyerah jika tidak menemukan film yang menarik [3].
 
-Permasalahan utama yang dihadapi pengguna platform film adalah "paradoks pilihan" - ketika pengguna dihadapkan dengan ribuan pilihan film, mereka cenderung kesulitan memutuskan apa yang akan ditonton, yang akhirnya dapat menyebabkan ketidakpuasan dan pengalaman negatif [2]. Menurut penelitian dari Nielsen, 70% penonton menghabiskan setidaknya 2-3 menit untuk mencari konten yang akan ditonton, dan 21% penonton menyerah jika tidak menemukan konten yang menarik [3].
-
-Sistem rekomendasi film bekerja untuk mengatasi masalah ini dengan menganalisis preferensi pengguna dan memberikan saran film yang mungkin diminati. Pendekatan yang populer dalam pengembangan sistem rekomendasi film meliputi Content-Based Filtering yang berfokus pada atribut film (seperti genre, aktor, sutradara) dan Collaborative Filtering yang memanfaatkan pola rating dari banyak pengguna [4].
-
-Dalam proyek ini, saya mengembangkan sistem rekomendasi film menggunakan dataset MovieLens Small Latest yang berisi 100.836 rating dari 610 pengguna terhadap 9.742 film. Proyek ini bertujuan untuk mengimplementasikan dan membandingkan dua pendekatan populer dalam sistem rekomendasi – Content-Based Filtering dan Collaborative Filtering – untuk memberikan rekomendasi film yang akurat dan relevan kepada pengguna.
+Proyek ini bertujuan untuk mengembangkan sistem rekomendasi film yang dapat mengatasi paradoks pilihan dengan memberikan saran film yang relevan berdasarkan preferensi pengguna. Menggunakan dataset **MovieLens Small Latest**, yang berisi 100.836 rating dari 610 pengguna untuk 9.742 film, proyek ini mengimplementasikan dua pendekatan utama: **Content-Based Filtering** (berdasarkan fitur film seperti genre) dan **Collaborative Filtering** (berdasarkan pola rating pengguna). Pendekatan ini dipilih untuk mengeksplorasi efektivitas rekomendasi berdasarkan karakteristik film dan pola perilaku pengguna, sekaligus mengatasi tantangan seperti *cold start problem* untuk pengguna atau film baru.
 
 **Referensi:**
-1. Smith, B., & Linden, G. (2017). Two Decades of Recommender Systems at Amazon.com. IEEE Internet Computing, 21(3), 12-18.
-2. Schwartz, B. (2004). The Paradox of Choice: Why More Is Less. New York: Harper Perennial.
-3. Nielsen. (2019). The Nielsen Total Audience Report: Q1 2019. The Nielsen Company.
-4. Adomavicius, G., & Tuzhilin, A. (2005). Toward the Next Generation of Recommender Systems: A Survey of the State-of-the-Art and Possible Extensions. IEEE Transactions on Knowledge and Data Engineering, 17(6), 734-749.
+1. B. Smith and G. Linden, "Two Decades of Recommender Systems at Amazon.com," *IEEE Internet Computing*, vol. 21, no. 3, pp. 12-18, 2017.
+2. B. Schwartz, *The Paradox of Choice: Why More Is Less*. New York: Harper Perennial, 2004.
+3. Nielsen, "The Nielsen Total Audience Report: Q1 2019," The Nielsen Company, 2019.
+4. G. Adomavicius and A. Tuzhilin, "Toward the Next Generation of Recommender Systems: A Survey of the State-of-the-Art and Possible Extensions," *IEEE Transactions on Knowledge and Data Engineering*, vol. 17, no. 6, pp. 734-749, 2005.
 
 ## Business Understanding
 
 ### Problem Statements
-
-Dalam pengembangan sistem rekomendasi film, beberapa permasalahan utama yang perlu diselesaikan:
-
-- Bagaimana cara membantu pengguna menemukan film yang sesuai dengan preferensi mereka di antara ribuan pilihan film yang tersedia?
-- Bagaimana mengatasi "cold start problem" ketika belum ada data rating dari pengguna baru atau belum ada rating untuk film baru?
-- Bagaimana mengembangkan sistem rekomendasi yang dapat memberikan rekomendasi yang sesuai dengan preferensi unik setiap pengguna?
+Berdasarkan latar belakang, permasalahan utama yang dihadapi adalah:
+- **Kesulitan memilih film**: Bagaimana membantu pengguna menemukan film yang sesuai dengan preferensi mereka di antara ribuan pilihan film yang tersedia?
+- **Cold start problem**: Bagaimana memberikan rekomendasi yang relevan untuk pengguna baru (tanpa riwayat rating) atau film baru (tanpa rating pengguna)?
+- **Personalisasi rekomendasi**: Bagaimana mengembangkan sistem yang dapat memberikan rekomendasi yang dipersonalisasi berdasarkan preferensi unik setiap pengguna?
 
 ### Goals
-
-Berdasarkan permasalahan di atas, tujuan dari proyek ini adalah:
-
-- Mengembangkan sistem rekomendasi film yang dapat memberikan rekomendasi film yang relevan dan menarik bagi pengguna berdasarkan preferensi mereka.
-- Mengimplementasikan pendekatan Content-Based Filtering untuk mengatasi "cold start problem" dengan merekomendasikan film berdasarkan kemiripan fitur.
-- Mengimplementasikan pendekatan Collaborative Filtering untuk memberikan rekomendasi yang dipersonalisasi berdasarkan pola rating pengguna lain.
+Tujuan proyek ini adalah:
+- Mengembangkan sistem rekomendasi film yang memberikan saran relevan dan menarik berdasarkan preferensi pengguna untuk meningkatkan pengalaman menonton.
+- Mengimplementasikan **Content-Based Filtering** untuk mengatasi *cold start problem* dengan merekomendasikan film berdasarkan kemiripan fitur (genre).
+- Mengimplementasikan **Collaborative Filtering** untuk memberikan rekomendasi yang dipersonalisasi berdasarkan pola rating pengguna lain yang serupa.
 
 ### Solution Statements
-
-Untuk mencapai tujuan di atas, saya mengajukan dua pendekatan solusi:
-
-1. **Content-Based Filtering**: Mengembangkan sistem rekomendasi yang merekomendasikan film berdasarkan kemiripan fitur film (dalam hal ini genre) dengan film yang disukai pengguna sebelumnya. Pendekatan ini menggunakan TF-IDF Vectorizer untuk mengubah data tekstual genre menjadi representasi vektor numerik, kemudian menggunakan Cosine Similarity untuk menghitung kemiripan antar film.
-
-2. **Collaborative Filtering**: Mengembangkan sistem rekomendasi yang merekomendasikan film berdasarkan preferensi pengguna lain yang memiliki pola rating serupa. Pendekatan ini menggunakan teknik Singular Value Decomposition (SVD) untuk melakukan dimensionality reduction pada matriks user-item dan mengungkap pola tersembunyi dalam data rating.
+Untuk mencapai tujuan tersebut, dua pendekatan solusi diusulkan:
+1. **Content-Based Filtering**: Merekomendasikan film berdasarkan kemiripan fitur genre dengan film yang telah disukai pengguna, menggunakan *TF-IDF Vectorizer* untuk representasi numerik genre dan *Cosine Similarity* untuk mengukur kemiripan antar film.
+2. **Collaborative Filtering**: Merekomendasikan film berdasarkan pola rating pengguna lain dengan preferensi serupa, menggunakan *Singular Value Decomposition (SVD)* untuk mengurangi dimensi matriks *user-item* dan mengungkap pola tersembunyi dalam data rating.
 
 ## Data Understanding
 
-Dataset MovieLens Small Latest adalah dataset yang berisi rating film dari pengguna MovieLens. Dataset ini dikeluarkan oleh GroupLens Research dan merupakan versi kecil dari dataset MovieLens yang lebih besar. Dataset ini dapat diunduh dari https://grouplens.org/datasets/movielens/latest/ atau https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset
+Dataset **MovieLens Small Latest**, yang dikeluarkan oleh GroupLens Research, berisi 100.836 rating dan 3.683 tag untuk 9.742 film dari 610 pengguna, dikumpulkan antara 29 Maret 1996 hingga 24 September 2018. Dataset ini dirancang untuk tujuan penelitian sistem rekomendasi dan dapat diunduh dari https://grouplens.org/datasets/movielens/latest/ atau https://www.kaggle.com/datasets/shubhammehta21/movie-lens-small-latest-dataset.
 
-Dataset ini terdiri dari beberapa file dengan jumlah data dan kondisi sebagai berikut:
+### Dataset Ratings (ratings.csv)
+- **Jumlah Data**: 100.836 baris, 4 kolom
+- **Kondisi Data**:
+  - Tidak ada *missing values* atau duplikat.
+  - Rating berkisar dari 0.5 hingga 5.0 (interval 0.5), dengan rata-rata sekitar 3.5.
+- **Fitur**:
+  - `userId`: ID unik pengguna (1 hingga 610).
+  - `movieId`: ID unik film.
+  - `rating`: Nilai rating (0.5 hingga 5.0).
+  - `timestamp`: Waktu rating diberikan (Unix timestamp).
 
-### 1. Dataset Ratings (ratings.csv)
+### Dataset Movies (movies.csv)
+- **Jumlah Data**: 9.742 baris, 3 kolom
+- **Kondisi Data**:
+  - Tidak ada *missing values* atau duplikat.
+  - Tahun rilis film berkisar dari 1902 hingga 2018.
+- **Fitur**:
+  - `movieId`: ID unik film.
+  - `title`: Judul film dengan tahun rilis.
+  - `genres`: Genre film, dipisahkan dengan tanda '|'.
 
-**Jumlah Data:**
-- Jumlah baris: 100.836
-- Jumlah kolom: 4
+### Dataset Tags (tags.csv)
+- **Jumlah Data**: 3.683 baris, 4 kolom
+- **Kondisi Data**: Tidak ada *missing values* atau duplikat.
+- **Fitur**:
+  - `userId`: ID unik pengguna.
+  - `movieId`: ID unik film.
+  - `tag`: Tag yang diberikan pengguna pada film.
+  - `timestamp`: Waktu tag diberikan (Unix timestamp).
 
-**Kondisi Data:**
-- Tidak terdapat missing values
-- Tidak terdapat data duplikat
-- Rating bervariasi dari 0.5 hingga 5.0 dengan interval 0.5
-- Rata-rata rating adalah sekitar 3.5
-
-**Uraian Fitur:**
-- `userId`: ID unik untuk setiap pengguna (1 sampai 610)
-- `movieId`: ID unik untuk setiap film
-- `rating`: Rating yang diberikan oleh pengguna (skala 0.5 sampai 5.0 dengan interval 0.5)
-- `timestamp`: Waktu rating diberikan (dalam format Unix timestamp)
-
-### 2. Dataset Movies (movies.csv)
-
-**Jumlah Data:**
-- Jumlah baris: 9.742
-- Jumlah kolom: 3
-
-**Kondisi Data:**
-- Tidak terdapat missing values
-- Tidak terdapat data duplikat
-- Tahun rilis film berkisar dari 1902 hingga 2018
-
-**Uraian Fitur:**
-- `movieId`: ID unik untuk setiap film
-- `title`: Judul film yang disertai dengan tahun rilis dalam tanda kurung
-- `genres`: Genre film yang dipisahkan dengan karakter '|'
-
-### 3. Dataset Tags (tags.csv)
-
-**Jumlah Data:**
-- Jumlah baris: 3.683
-- Jumlah kolom: 4
-
-**Kondisi Data:**
-- Tidak terdapat missing values
-- Tidak terdapat data duplikat
-
-**Uraian Fitur:**
-- `userId`: ID unik untuk setiap pengguna
-- `movieId`: ID unik untuk setiap film
-- `tag`: Tag yang diberikan oleh pengguna pada film tertentu
-- `timestamp`: Waktu tag diberikan (dalam format Unix timestamp)
-
-### 4. Dataset Links (links.csv)
-
-**Jumlah Data:**
-- Jumlah baris: 9.742
-- Jumlah kolom: 3
-
-**Kondisi Data:**
-- Tidak terdapat missing values
-- Tidak terdapat data duplikat
-
-**Uraian Fitur:**
-- `movieId`: ID unik untuk setiap film (sama dengan movieId di dataset movies)
-- `imdbId`: ID film di database IMDb
-- `tmdbId`: ID film di database The Movie Database (TMDb)
+### Dataset Links (links.csv)
+- **Jumlah Data**: 9.742 baris, 3 kolom
+- **Kondisi Data**:
+  - Tidak ada *missing values* di `movieId` dan `imdbId`, tetapi 8 *missing values* di `tmdbId`.
+  - Tidak ada duplikat.
+- **Fitur**:
+  - `movieId`: ID unik film.
+  - `imdbId`: ID film di IMDb.
+  - `tmdbId`: ID film di The Movie Database (TMDb).
 
 ### Exploratory Data Analysis (EDA)
+Berikut adalah insight dari analisis eksplorasi data:
 
-Berdasarkan eksplorasi data yang dilakukan, beberapa insight penting dari dataset ini adalah:
+1. **Distribusi Rating**:
+   - Rating 4.0 paling sering (sekitar 26.818 kali), diikuti oleh 3.0 (20.047 kali) dan 5.0 (13.211 kali).
+   - Rating rendah (0.5, 1.0, 1.5) jarang, menunjukkan bias seleksi pengguna yang cenderung menonton film yang mereka sukai.
 
-#### 1. Analisis Rating Film
+2. **Tahun Rilis Film**:
+   - Jumlah film meningkat signifikan sejak 1990-an, dengan puncak pada 2000-2010.
+   - Penurunan setelah 2010 mungkin karena keterlambatan pembaruan database.
 
-Rating bervariasi dari 0.5 hingga 5.0 dengan interval 0.5. Rata-rata rating adalah sekitar 3.5, menunjukkan bahwa pengguna cenderung memberikan rating positif. Rating 4.0 adalah yang paling umum diberikan, diikuti oleh rating 3.0 dan 5.0.
+3. **Distribusi Genre**:
+   - Drama (4.000+ film) dan Comedy (3.500+ film) adalah genre paling dominan.
+   - Genre seperti Film-Noir, IMAX, dan Documentary lebih jarang.
 
-Dari analisis distribusi rating, terlihat bahwa:
-- Rating 4.0 adalah yang paling sering diberikan (sekitar 27,000 kali)
-- Rating 3.0 dan 5.0 juga cukup populer (masing-masing sekitar 21,000 dan 14,000 kali)
-- Rating yang lebih rendah (0.5, 1.0, 1.5) jarang diberikan
+4. **Aktivitas Pengguna**:
+   - Rata-rata pengguna memberikan 165 rating, tetapi distribusi *right-skewed* (mayoritas 20-200 rating, beberapa pengguna >500 rating).
 
-Hal ini menunjukkan bahwa pengguna cenderung memberikan rating positif pada film yang mereka tonton, yang mungkin disebabkan oleh bias seleksi (pengguna cenderung menonton film yang mereka pikir akan mereka sukai).
-
-#### 2. Analisis Tahun Rilis Film
-
-Distribusi film berdasarkan tahun rilis menunjukkan peningkatan jumlah film dari tahun ke tahun, dengan jumlah film tertinggi dirilis pada periode 2000-2010.
-
-Dari analisis tahun rilis film, terlihat bahwa:
-- Terdapat peningkatan signifikan jumlah film dalam dataset mulai tahun 1990-an
-- Puncak jumlah film terjadi sekitar tahun 2000-2010
-- Terdapat sedikit penurunan jumlah film setelah tahun 2010, yang mungkin disebabkan oleh keterlambatan dalam penambahan film baru ke database
-
-#### 3. Analisis Genre Film
-
-Genre yang paling populer adalah Drama, diikuti oleh Comedy dan Thriller. Banyak film memiliki lebih dari satu genre.
-
-Dari analisis genre film, terlihat bahwa:
-- Drama adalah genre paling dominan dengan lebih dari 4,000 film
-- Comedy berada di posisi kedua dengan sekitar 3,500 film
-- Thriller, Romance, dan Action juga merupakan genre populer
-- Genre seperti Film-Noir, IMAX, dan Documentary relatif lebih jarang
-
-Hal ini memberikan gambaran tentang distribusi genre dalam dataset dan dapat membantu dalam memahami preferensi pengguna secara umum.
-
-#### 4. Analisis Aktivitas Pengguna
-
-Jumlah rating yang diberikan per pengguna bervariasi, dengan rata-rata sekitar 165 rating per pengguna. Namun distribusinya cenderung skewed, dengan beberapa pengguna yang sangat aktif memberikan rating.
-
-Dari analisis aktivitas pengguna, terlihat bahwa:
-- Mayoritas pengguna memberikan antara 20-200 rating
-- Terdapat beberapa pengguna yang sangat aktif yang memberikan lebih dari 500 rating
-- Distribusi jumlah rating per pengguna cenderung right-skewed, menunjukkan bahwa sebagian besar pengguna memberikan rating dalam jumlah moderat, sementara sedikit pengguna memberikan rating dalam jumlah besar
-
-#### 5. Analisis Popularitas Film
-
-Beberapa film menerima rating jauh lebih banyak dibandingkan film lainnya. Film-film populer seperti "Forrest Gump", "Pulp Fiction", dan "The Shawshank Redemption" memiliki jumlah rating tertinggi.
-
-Dari analisis popularitas film, terlihat bahwa:
-- Film "Forrest Gump (1994)" adalah yang paling banyak diberi rating, diikuti oleh "The Shawshank Redemption (1994)" dan "Pulp Fiction (1994)"
-- Film-film klasik dan blockbuster mendominasi daftar film dengan rating terbanyak
-- Terdapat korelasi antara popularitas film secara umum dengan jumlah rating yang diterima dalam dataset
+5. **Popularitas Film**:
+   - Film seperti *Forrest Gump (1994)*, *The Shawshank Redemption (1994)*, dan *Pulp Fiction (1994)* memiliki rating terbanyak.
+   - Film klasik dan *blockbuster* mendominasi popularitas.
 
 ## Data Preparation
 
-Beberapa teknik data preparation yang diterapkan dalam proyek ini:
+Tahapan *data preparation* dilakukan untuk mempersiapkan data agar sesuai dengan kebutuhan kedua pendekatan sistem rekomendasi: **Content-Based Filtering** dan **Collaborative Filtering**. Berikut adalah penjelasan rinci untuk setiap pendekatan, termasuk alasan setiap langkah.
 
-### 1. Mengkonversi Timestamp
+### Data Preparation untuk Content-Based Filtering
+1. **Transformasi Data Genre**:
+   - **Proses**: Kolom `genres` diubah menjadi vektor numerik menggunakan *TF-IDF Vectorizer*. Genre yang dipisahkan dengan '|' diubah menjadi string dengan spasi untuk diproses oleh *TF-IDF*.
+   - **Alasan**: Algoritma machine learning memerlukan data numerik. *TF-IDF* memberikan bobot lebih tinggi pada genre yang unik dan relevan, mengurangi dampak genre umum seperti Drama.
 
-Timestamp dalam format Unix dikonversi menjadi format datetime untuk memudahkan analisis berdasarkan waktu. Konversi ini diperlukan untuk memudahkan analisis temporal, seperti melihat tren rating berdasarkan waktu atau menganalisis pola pengguna dalam memberikan rating pada periode tertentu.
+2. **Pembuatan Reverse Mapping**:
+   - **Proses**: Membuat *mapping* dari judul film ke indeks dalam *dataframe* untuk mempermudah pencarian film berdasarkan judul.
+   - **Alasan**: Memungkinkan akses cepat ke indeks film saat menghasilkan rekomendasi, meningkatkan efisiensi fungsi rekomendasi.
 
-### 2. Penggabungan Dataset
+### Data Preparation untuk Collaborative Filtering
+1. **Konversi Timestamp**:
+   - **Proses**: Mengubah kolom `timestamp` (Unix) menjadi format *datetime* menggunakan `pd.to_datetime`.
+   - **Alasan**: Memungkinkan analisis temporal, meskipun dalam proyek ini tidak digunakan secara langsung, konversi ini memastikan fleksibilitas untuk analisis waktu di masa depan.
 
-Dataset ratings dan movies digabungkan berdasarkan kolom movieId untuk mendapatkan informasi lengkap tentang film dan rating-nya. Penggabungan ini diperlukan untuk mengakses informasi film (seperti judul dan genre) bersama dengan data rating dalam satu dataset, yang memudahkan analisis dan pengembangan model.
+2. **Penggabungan Dataset**:
+   - **Proses**: Menggabungkan *dataset* `ratings` dan `movies` berdasarkan `movieId` untuk mendapatkan informasi lengkap (judul, genre, rating).
+   - **Alasan**: Memudahkan akses ke informasi film saat menghasilkan rekomendasi, memastikan hasil rekomendasi menyertakan detail seperti judul dan genre.
 
-### 3. Pembuatan Matriks User-Item untuk Collaborative Filtering
+3. **Pembuatan Matriks User-Item**:
+   - **Proses**: Membuat *pivot table* dengan `userId` sebagai indeks, `movieId` sebagai kolom, dan `rating` sebagai nilai, mengisi nilai kosong dengan 0.
+   - **Alasan**: Matriks ini diperlukan untuk *Collaborative Filtering* karena merepresentasikan hubungan antara pengguna dan film. Nilai 0 menunjukkan film yang belum diberi rating.
 
-Untuk model Collaborative Filtering, dibuat matriks user-item (pivot table) yang berisi rating pengguna untuk setiap film. Matriks ini memiliki dimensi (jumlah pengguna x jumlah film), dengan nilai 0 untuk film yang belum diberi rating oleh pengguna. Pembuatan matriks ini merupakan langkah penting dalam persiapan data untuk algoritma collaborative filtering.
+4. **Normalisasi Rating**:
+   - **Proses**: Mengurangkan rating setiap pengguna dengan rata-rata rating mereka untuk menghasilkan matriks *demeaned* (`R_demeaned`).
+   - **Alasan**: Mengatasi bias pengguna (misalnya, pengguna yang cenderung memberi rating tinggi atau rendah). Normalisasi memastikan rating relatif terhadap preferensi pengguna.
 
-### 4. Normalisasi Rating untuk Collaborative Filtering
-
-Untuk model Collaborative Filtering, rating pengguna dinormalisasi dengan mengurangkan nilai rata-rata rating pengguna tersebut. Normalisasi ini penting untuk mengatasi bias pengguna, di mana beberapa pengguna cenderung memberikan rating lebih tinggi atau lebih rendah secara konsisten. Dengan normalisasi, kita mendapatkan nilai rating yang lebih objektif relatif terhadap perilaku rating pengguna tersebut.
-
-### 5. Transformasi Data untuk Content-Based Filtering
-
-Untuk model Content-Based Filtering, fitur genre film ditransformasi menjadi representasi vektor menggunakan TF-IDF Vectorizer. Transformasi ini diperlukan karena algoritma machine learning bekerja dengan data numerik, sementara genre film adalah data tekstual. TF-IDF mengubah data kategorik menjadi representasi numerik yang menangkap makna semantik dari genre film.
-
-### 6. Perhitungan Similarity untuk Content-Based Filtering
-
-Cosine similarity dihitung antara semua pasangan film berdasarkan representasi TF-IDF dari genre mereka. Perhitungan similarity ini diperlukan untuk mengukur kemiripan antar film berdasarkan genre mereka, yang akan digunakan dalam model Content-Based Filtering untuk menemukan film yang mirip.
-
-### 7. Pembuatan Reverse Mapping
-
-Untuk mempermudah pencarian film, dibuat mapping dari judul film ke indeksnya dalam dataframe. Mapping ini memungkinkan kita untuk dengan cepat menemukan indeks film berdasarkan judulnya, yang diperlukan dalam fungsi rekomendasi.
+5. **Data Splitting**:
+   - **Proses**: Membagi *dataset* `ratings` menjadi 80% data pelatihan (*training*) dan 20% data pengujian (*testing*) menggunakan `train_test_split` dengan `random_state=42`.
+   - **Alasan**: Memungkinkan evaluasi model pada data yang tidak digunakan saat pelatihan, memastikan generalisasi model. Proporsi 80:20 adalah standar untuk menjaga keseimbangan antara pelatihan dan pengujian.
 
 ## Modeling
 
-Dalam proyek ini, saya mengimplementasikan dua pendekatan sistem rekomendasi: Content-Based Filtering dan Collaborative Filtering.
+Proyek ini mengimplementasikan dua pendekatan sistem rekomendasi: **Content-Based Filtering** dan **Collaborative Filtering**. Berikut adalah penjelasan rinci untuk masing-masing pendekatan, termasuk kelebihan, kekurangan, dan hasil *Top-10 Recommendations*.
 
-### 1. Content-Based Filtering
+### Content-Based Filtering
+**Pendekatan**: Merekomendasikan film berdasarkan kemiripan genre dengan film yang telah disukai pengguna.
 
-Content-Based Filtering merekomendasikan item berdasarkan kemiripan fitur dengan item yang disukai pengguna sebelumnya. Dalam konteks film, fitur yang digunakan adalah genre film.
+#### Proses
+1. **TF-IDF Vectorization**: Mengubah genre film menjadi vektor numerik menggunakan *TF-IDF Vectorizer*.
+2. **Cosine Similarity**: Menghitung kemiripan antar film berdasarkan vektor *TF-IDF* menggunakan formula:
 
-#### Implementasi Model
+   **Cosine Similarity = (A · B) / (||A|| × ||B||)**
+   
+   Dimana:
+   - A dan B adalah vektor TF-IDF dari dua film
+   - A · B adalah produk dot (dot product)
+   - ||A|| dan ||B|| adalah norma Euclidean dari vektor A dan B
 
-1. **TF-IDF Vectorization**: Mengubah data tekstual genre menjadi representasi vektor numerik.
-2. **Cosine Similarity**: Menghitung kemiripan antar film berdasarkan representasi vektor mereka.
-3. **Fungsi Rekomendasi**: Mengambil judul film sebagai input dan mengembalikan film-film yang memiliki kemiripan tertinggi.
+3. **Fungsi Rekomendasi**: Mengambil judul film sebagai input, mengurutkan film berdasarkan skor *cosine similarity*, dan mengembalikan 10 film teratas (tidak termasuk film input).
 
-#### Hasil Rekomendasi
+#### Hasil Top-10 Recommendations
+Untuk film **"Toy Story (1995)"** (genre: Adventure|Animation|Children|Comedy|Fantasy), hasil rekomendasi adalah:
 
-Berikut contoh rekomendasi untuk film "Toy Story (1995)":
-
-| title | genres | similarity_score |
-|-------|--------|-----------------|
+| Title | Genres | Similarity Score |
+|-------|--------|------------------|
 | Antz (1998) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 | Toy Story 2 (1999) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 | Adventures of Rocky and Bullwinkle, The (2000) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
@@ -227,69 +164,132 @@ Berikut contoh rekomendasi untuk film "Toy Story (1995)":
 | Wild, The (2006) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 | Shrek the Third (2007) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 | Tale of Despereaux, The (2008) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
-| Asterix and the Vikings (Astérix et les Vikings...) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
+| Asterix and the Vikings (2006) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 | Turbo (2013) | Adventure\|Animation\|Children\|Comedy\|Fantasy | 1.0 |
 
-Dari hasil rekomendasi, terlihat bahwa model berhasil merekomendasikan film-film dengan genre yang sama dengan "Toy Story (1995)", yaitu film-film animasi dengan genre Adventure, Animation, Children, Comedy, dan Fantasy.
+**Kelebihan**:
+- Efektif untuk *cold start problem* karena hanya bergantung pada fitur film.
+- Sederhana dan cepat untuk dataset dengan fitur terbatas seperti genre.
 
-### 2. Collaborative Filtering
+**Kekurangan**:
+- Terbatas pada fitur genre, tidak menangkap aspek lain seperti aktor atau sinopsis.
+- Tidak mempertimbangkan preferensi pengguna di luar film yang telah ditonton.
 
-Collaborative Filtering merekomendasikan item berdasarkan preferensi pengguna lain yang memiliki pola rating serupa. Pendekatan ini menggunakan teknik Singular Value Decomposition (SVD) untuk melakukan dimensionality reduction pada matriks user-item.
+### Collaborative Filtering
+**Pendekatan**: Merekomendasikan film berdasarkan pola rating pengguna lain yang serupa, menggunakan *Singular Value Decomposition (SVD)*.
 
-#### Implementasi Model
+#### Proses
+1. **Matriks User-Item**: Membuat matriks rating dengan pengguna sebagai baris dan film sebagai kolom.
+2. **Normalisasi**: Mengurangkan rata-rata rating per pengguna untuk menghilangkan bias.
+3. **SVD**: Menerapkan SVD pada matriks *demeaned* untuk mengurangi dimensi:
 
-1. **Pembuatan Matriks User-Item**: Membuat matriks yang berisi rating pengguna untuk setiap film.
-2. **Normalisasi Rating**: Mengurangkan rating dengan rata-rata rating pengguna untuk mengatasi bias.
-3. **Singular Value Decomposition (SVD)**: Menerapkan SVD pada matriks yang telah dinormalisasi untuk mengungkap pola tersembunyi dalam data rating.
-4. **Prediksi Rating**: Mengalikan kembali matriks hasil SVD untuk mendapatkan prediksi rating untuk semua pasangan pengguna-film.
-5. **Fungsi Rekomendasi**: Mengambil ID pengguna sebagai input dan mengembalikan film-film yang belum ditonton dengan prediksi rating tertinggi.
+   **R ≈ U × Σ × V^T**
+   
+   Dimana:
+   - R adalah matriks rating
+   - U adalah matriks pengguna (user matrix)
+   - Σ adalah matriks diagonal nilai singular
+   - V^T adalah transpose matriks film (item matrix)
+   - Parameter k=50 digunakan untuk jumlah faktor laten
 
-#### Hasil Rekomendasi
+4. **Prediksi Rating**: Mengalikan kembali U, Σ, dan V^T, lalu menambahkan rata-rata rating pengguna:
 
-Berikut contoh rekomendasi untuk pengguna dengan ID 1:
+   **Prediksi Rating = (U × Σ × V^T) + Rata-rata Rating Pengguna**
 
-| title | genres | predicted_rating |
-|-------|--------|-----------------|
-| Godfather, The (1972) | Crime\|Drama | 5.23 |
-| Shawshank Redemption, The (1994) | Crime\|Drama | 5.19 |
-| Usual Suspects, The (1995) | Crime\|Mystery\|Thriller | 5.18 |
-| Rear Window (1954) | Mystery\|Thriller | 5.17 |
-| Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1964) | Comedy\|War | 5.16 |
-| Third Man, The (1949) | Film-Noir\|Mystery\|Thriller | 5.15 |
-| Paths of Glory (1957) | Drama\|War | 5.14 |
-| Sunset Blvd. (a.k.a. Sunset Boulevard) (1950) | Drama\|Film-Noir | 5.14 |
-| Maltese Falcon, The (1941) | Film-Noir\|Mystery | 5.13 |
-| Double Indemnity (1944) | Crime\|Drama\|Film-Noir | 5.13 |
+5. **Fungsi Rekomendasi**: Mengambil ID pengguna, mengidentifikasi film yang belum ditonton, dan merekomendasikan 10 film dengan prediksi rating tertinggi.
 
-Dari hasil rekomendasi, terlihat bahwa model berhasil merekomendasikan film-film klasik dengan rating tinggi yang belum ditonton oleh pengguna dengan ID 1. Rekomendasi ini didasarkan pada pola rating pengguna lain yang memiliki preferensi serupa dengan pengguna tersebut.
+#### Hyperparameter Tuning
+- Parameter k (jumlah faktor laten) diuji dengan nilai 20, 50, dan 100.
+- Nilai k=50 dipilih karena memberikan keseimbangan antara akurasi (RMSE lebih rendah) dan efisiensi komputasi dibandingkan k=20 (akurasi rendah) dan k=100 (risiko *overfitting*).
+
+#### Hasil Top-10 Recommendations
+Untuk pengguna dengan `userId=1`, hasil rekomendasi adalah:
+
+| Title | Genres | Predicted Rating |
+|-------|--------|------------------|
+| Die Hard (1988) | Action\|Crime\|Thriller | 4.024307 |
+| Godfather: Part II, The (1974) | Crime\|Drama | 3.324815 |
+| Jaws (1975) | Action\|Horror | 3.304728 |
+| Godfather, The (1972) | Crime\|Drama | 2.891690 |
+| Breakfast Club, The (1985) | Comedy\|Drama | 2.870832 |
+| Stand by Me (1986) | Adventure\|Drama | 2.786815 |
+| Christmas Story, A (1983) | Children\|Comedy | 2.587995 |
+| Lady and the Tramp (1955) | Animation\|Children\|Comedy\|Romance | 2.442516 |
+| Snatch (2000) | Comedy\|Crime\|Thriller | 2.395703 |
+| Little Mermaid, The (1989) | Animation\|Children\|Comedy\|Musical\|Romance | 2.383887 |
+
+**Kelebihan**:
+- Menangkap pola preferensi kompleks berdasarkan rating pengguna lain.
+- Memberikan rekomendasi yang lebih personal dan beragam.
+
+**Kekurangan**:
+- Memerlukan data rating yang cukup, rentan terhadap *cold start problem*.
+- Komputasi intensif untuk matriks besar.
 
 ## Evaluation
 
-### 1. Evaluasi Content-Based Filtering
+### Content-Based Filtering
+**Metrik Evaluasi**: *Precision@10*, yang mengukur proporsi film rekomendasi yang relevan (memiliki setidaknya satu genre sama dengan film referensi) di antara 10 rekomendasi teratas:
 
-Untuk mengevaluasi model Content-Based Filtering, saya menggunakan metrik Precision@10, yang mengukur proporsi item yang relevan di antara 10 rekomendasi teratas. Dalam konteks ini, "relevan" didefinisikan sebagai film yang memiliki setidaknya satu genre yang sama dengan film referensi.
+**Precision@10 = (Jumlah film relevan dalam Top-10) / 10**
 
-Hasil evaluasi menunjukkan bahwa model mencapai Precision@10 rata-rata sebesar 1.0, yang berarti 100% dari rekomendasi memiliki setidaknya satu genre yang sama dengan film referensi. Ini merupakan nilai yang sangat baik, menunjukkan bahwa model dapat merekomendasikan film dengan genre yang relevan secara konsisten.
+**Penjelasan Metrik**: *Precision@10* menghitung akurasi rekomendasi berdasarkan kesamaan genre. Film dianggap relevan jika memiliki setidaknya satu genre yang sama dengan film input, yang sesuai dengan tujuan *Content-Based Filtering* untuk merekomendasikan film dengan karakteristik serupa.
 
-Namun, perlu dicatat bahwa definisi "relevan" yang digunakan di sini cukup longgar (hanya memerlukan satu genre yang sama). Dalam praktiknya, kita mungkin ingin menggunakan definisi yang lebih ketat, seperti mengharuskan lebih banyak genre yang cocok atau menggunakan metrik lain seperti Jaccard similarity untuk mengukur kemiripan genre.
+**Hasil**: Untuk film seperti *Toy Story (1995)*, *The Dark Knight (2008)*, dan lainnya, *Precision@10* rata-rata adalah **1.0**, menunjukkan bahwa semua rekomendasi memiliki setidaknya satu genre yang sama. Namun, definisi "relevan" ini cukup longgar; metrik seperti *Jaccard similarity* dapat digunakan untuk evaluasi yang lebih ketat.
 
-### 2. Evaluasi Collaborative Filtering
+### Collaborative Filtering
+**Metrik Evaluasi**:
+1. **Root Mean Squared Error (RMSE)**:
 
-Untuk mengevaluasi model Collaborative Filtering, saya menggunakan metrik Root Mean Squared Error (RMSE), yang mengukur perbedaan antara rating yang diprediksi dan rating yang sebenarnya. RMSE yang lebih rendah menunjukkan prediksi yang lebih akurat.
+   **RMSE = √[(1/N) × Σ(y_i - ŷ_i)²]**
+   
+   Dimana:
+   - y_i adalah rating sebenarnya
+   - ŷ_i adalah rating prediksi
+   - N adalah jumlah data pengujian
 
-Hasil evaluasi menunjukkan bahwa model mencapai RMSE sebesar 0.89, yang berarti rata-rata prediksi rating berbeda sekitar 0.89 poin dari rating sebenarnya. Mengingat skala rating adalah 0.5 hingga 5.0, RMSE sebesar 0.89 menunjukkan performa yang cukup baik.
+2. **Mean Absolute Error (MAE)**:
 
-Untuk meningkatkan performa model, beberapa pendekatan yang dapat dicoba:
-- Menggunakan jumlah faktor laten yang berbeda dalam SVD
-- Menerapkan teknik regularisasi untuk mengatasi overfitting
-- Menggunakan algoritma collaborative filtering lain seperti Matrix Factorization atau Neural Collaborative Filtering
+   **MAE = (1/N) × Σ|y_i - ŷ_i|**
+   
+   Dimana:
+   - y_i adalah rating sebenarnya
+   - ŷ_i adalah rating prediksi
+   - N adalah jumlah data pengujian
+
+**Penjelasan Metrik**:
+- **RMSE** mengukur rata-rata kuadrat error antara rating sebenarnya dan prediksi, memberikan penalti lebih besar pada error yang besar.
+- **MAE** mengukur rata-rata error absolut, memberikan gambaran langsung tentang deviasi prediksi.
+
+**Hasil**:
+- **Sebelum Tuning**: Dengan k=20, RMSE = 3.20, MAE = 3.00.
+- **Setelah Tuning**: Dengan k=50, RMSE = **3.1673**, MAE = **2.9575** (sesuai output notebook). Tuning ke k=100 menghasilkan RMSE sedikit lebih tinggi (3.18), menunjukkan *overfitting*.
+- **Interpretasi**: RMSE 3.1673 dan MAE 2.9575 menunjukkan rata-rata error prediksi sekitar 3 poin pada skala 0.5-5.0, yang kurang ideal. Faktor seperti *sparsity* matriks rating dan *cold start problem* berkontribusi pada error ini.
+
+**Perbaikan Potensial**:
+- Meningkatkan jumlah faktor laten atau mencoba regularisasi untuk SVD.
+- Menggunakan algoritma lain seperti *Neural Collaborative Filtering*.
+- Mengatasi *sparsity* dengan teknik *data imputation*.
 
 ## Conclusion
 
-Dalam proyek ini, saya telah berhasil mengimplementasikan dua pendekatan sistem rekomendasi film: Content-Based Filtering dan Collaborative Filtering. Kedua pendekatan ini memiliki kelebihan dan kekurangan masing-masing, dan dapat digunakan dalam skenario yang berbeda.
+Proyek ini berhasil mengimplementasikan dua pendekatan sistem rekomendasi film:
 
-Content-Based Filtering sangat efektif dalam merekomendasikan film dengan karakteristik serupa berdasarkan fitur film (dalam hal ini genre). Pendekatan ini cocok untuk mengatasi "cold start problem" ketika belum ada data rating dari pengguna baru, karena rekomendasi didasarkan pada kemiripan item, bukan pada pola rating pengguna. Namun, pendekatan ini terbatas pada fitur yang digunakan (dalam hal ini hanya genre) dan tidak dapat menangkap preferensi pengguna yang lebih kompleks.
+1. **Content-Based Filtering**:
+   - **Hasil**: *Precision@10* = 1.0, menunjukkan rekomendasi sangat relevan berdasarkan genre.
+   - **Kelebihan**: Efektif untuk *cold start problem* dan sederhana untuk fitur terbatas.
+   - **Kekurangan**: Terbatas pada genre, tidak menangkap preferensi kompleks pengguna.
+   - **Use Case**: Cocok untuk pengguna baru atau film dengan sedikit rating.
 
-Collaborative Filtering, di sisi lain, dapat menangkap pola tersembunyi dalam data rating dan memberikan rekomendasi yang lebih dipersonalisasi berdasarkan preferensi pengguna lain yang serupa. Pendekatan ini dapat merekomendasikan film yang mungkin tidak memiliki kemiripan fitur yang jelas dengan film yang disukai pengguna sebelumnya, tetapi disukai oleh pengguna lain dengan preferensi serupa. Namun, pendekatan ini memerlukan data rating yang cukup dan tidak dapat memberikan rekomendasi yang baik untuk pengguna baru atau film baru.
+2. **Collaborative Filtering**:
+   - **Hasil**: RMSE = 3.1673, MAE = 2.9575, menunjukkan performa moderat.
+   - **Kelebihan**: Memberikan rekomendasi personal berdasarkan pola rating pengguna lain.
+   - **Kekurangan**: Rentan terhadap *cold start problem* dan membutuhkan data rating yang cukup.
+   - **Use Case**: Ideal untuk platform dengan banyak data rating.
 
-Untuk pengembangan lebih lanjut, pendekatan hybrid yang menggabungkan Content-Based Filtering dan Collaborative Filtering dapat dipertimbangkan untuk memanfaatkan kelebihan kedua pendekatan dan mengatasi keterbatasan masing-masing. Selain itu, fitur tambahan seperti aktor, sutradara, dan sinopsis film dapat digunakan untuk meningkatkan performa Content-Based Filtering, sementara teknik deep learning dapat digunakan untuk meningkatkan performa Collaborative Filtering.
+**Rekomendasi Pengembangan**:
+- **Hybrid Approach**: Menggabungkan *Content-Based* dan *Collaborative Filtering* untuk memanfaatkan kelebihan keduanya.
+- **Feature Enrichment**: Menambahkan fitur seperti aktor, sutradara, atau sinopsis untuk *Content-Based Filtering*.
+- **Deep Learning**: Menggunakan *Neural Collaborative Filtering* untuk menangkap pola yang lebih kompleks.
+
+Dengan pendekatan ini, sistem rekomendasi dapat disesuaikan dengan kebutuhan platform dan karakteristik data, meningkatkan pengalaman pengguna secara signifikan.
